@@ -1,7 +1,7 @@
 // app/(tabs)/_layout.tsx
 import React, { useEffect } from 'react';
 import { Tabs, Redirect } from 'expo-router'; // Import Redirect
-import { useAuthStore } from '../../src/store/authStore';
+import { useAuthStore } from '../../src/features/auth/stores/authStore';
 import { ActivityIndicator, View } from 'react-native';
 
 export default function TabsLayout() {
