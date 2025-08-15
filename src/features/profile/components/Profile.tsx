@@ -2,12 +2,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useQuery, useMutation } from '@tanstack/react-query';
-
-// Impor semua yang dibutuhkan dari fitur auth
 import { useAuthStore } from '../../auth/stores/authStore';
 import { getUserProfile, logOutUser } from '../../auth/api/authAPI';
 import { UserProfile } from '../../auth/types';
-import { Redirect } from 'expo-router';
 
 export const Profile = () => {
   const { logout: clearLocalTokens } = useAuthStore();

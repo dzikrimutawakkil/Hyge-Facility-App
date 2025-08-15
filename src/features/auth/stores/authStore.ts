@@ -2,12 +2,11 @@
 import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
 
-// 1. TAMBAHKAN 'isInitializing' ke dalam interface
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
-  isInitializing: boolean; // <-- BARIS INI DITAMBAHKAN
+  isInitializing: boolean;
   setTokens: (access: string, refresh: string) => Promise<void>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
@@ -41,7 +40,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (e) {
       console.error("Failed to initialize auth state", e);
     } finally {
-      // Pastikan isInitializing menjadi false setelah selesai
       set({ isInitializing: false });
     }
   },

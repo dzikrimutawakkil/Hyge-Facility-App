@@ -6,29 +6,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Picker } from '@react-native-picker/picker';
-
-// DIIMPOR: Menggunakan tipe dan fungsi API dari lokasi baru yang terpusat
 import { createBooking } from '../api/bookingsAPI';
-import { fetchAvailability } from '../api/bookingsAPI'; // Mengambil dari fitur facilities
+import { fetchAvailability } from '../api/bookingsAPI'; 
 import { bookingSchema, BookingFormValues } from '../types';
-import { TimeSlot } from '../types'; // Mengambil dari fitur facilities
 
-// Nama komponen diubah dan diekspor
 export const BookingForm = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Mengambil parameter dari URL (facilityId, bookingDate, dan hour)
   const { params, hour } = useLocalSearchParams<{ params: string[], hour?: string }>();
   const facilityIdFromUrl = params?.[0];
   const bookingDate = params?.[1];
 
-  // Mengubah facilityId dari string (URL) menjadi number
   const facilityIdAsNumber = facilityIdFromUrl ? parseInt(facilityIdFromUrl, 10) : undefined;
 
   const { control, handleSubmit, formState: { errors } } = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
-    // Mengisi form dengan data dari URL
     defaultValues: {
       facilityId: facilityIdAsNumber,
       bookingDate: bookingDate,
@@ -37,23 +30,19 @@ export const BookingForm = () => {
     },
   });
 
-  // Query untuk mengambil slot waktu yang tersedia
   const { data: availableSlots, isLoading: isLoadingSlots } = useQuery({
     queryKey: ['availability', facilityIdAsNumber, bookingDate],
     queryFn: () => fetchAvailability(facilityIdAsNumber!, bookingDate!),
     enabled: !!facilityIdAsNumber && !!bookingDate,
   });
 
-  // Mutation untuk mengirim data booking baru
   const mutation = useMutation({
     mutationFn: createBooking,
     onSuccess: () => {
       Alert.alert('Sukses!', 'Booking Anda telah dikonfirmasi.');
-      // Memuat ulang data di layar lain agar selalu update
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       queryClient.invalidateQueries({ queryKey: ['monthlyAvailability'] });
-      // Kembali ke halaman daftar booking
       router.push('/booking');
     },
     onError: (error: any) => {
@@ -73,7 +62,6 @@ export const BookingForm = () => {
     return <Text style={styles.errorText}>Informasi booking tidak lengkap.</Text>;
   }
 
-  // Bagian JSX (return) tidak ada perubahan
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
       <Text style={styles.header}>Konfirmasi Booking Anda</Text>
@@ -130,7 +118,6 @@ export const BookingForm = () => {
   );
 }
 
-// Styles tidak ada perubahan
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, paddingHorizontal: 20, paddingTop: 20 },

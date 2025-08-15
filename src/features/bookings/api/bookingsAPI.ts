@@ -25,7 +25,7 @@ export const cancelBooking = async (bookingId: number) => {
 };
 
 export const fetchAvailability = async (id: number | undefined, date: string): Promise<TimeSlot[]> => {
-  if (!id) return []; // Don't fetch if ID isn't available
+  if (!id) return [];
   const response = await api.get(`/facilities/${id}/availability/daily?date=${date}`);
   return response.data.timeSlots || [];
 };

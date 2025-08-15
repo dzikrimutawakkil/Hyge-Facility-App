@@ -26,7 +26,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Fasilitas',
-          headerRight: () => <ProfileIcon />,
+          headerShown: false, 
         }}
       />
       <Tabs.Screen

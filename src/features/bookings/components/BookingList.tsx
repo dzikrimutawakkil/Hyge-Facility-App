@@ -2,12 +2,8 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-// DIIMPOR: Menggunakan tipe dan fungsi API dari lokasi baru yang terpusat
 import { fetchMyBookings, cancelBooking } from '../api/bookingsAPI';
 import { Booking, BookingsPage } from '../types';
-
-// Nama komponen diubah dan diekspor
 export const BookingList = () => {
   const queryClient = useQueryClient();
   
@@ -29,7 +25,6 @@ export const BookingList = () => {
     queryFn: fetchMyBookings,
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      // Menggunakan struktur data API yang sudah diperbaiki
       if (lastPage.page < lastPage.totalPages) {
         return lastPage.page + 1;
       }
@@ -41,7 +36,6 @@ export const BookingList = () => {
     mutationFn: cancelBooking,
     onSuccess: () => {
       Alert.alert('Sukses', 'Booking Anda telah dibatalkan.');
-      // Memuat ulang data booking setelah pembatalan berhasil
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
     },
     onError: (err: any) => {
@@ -56,12 +50,10 @@ export const BookingList = () => {
     ]);
   };
   
-  // Menggunakan struktur data API yang sudah diperbaiki (page.bookings)
   const bookings = useMemo(() => data?.pages.flatMap(page => page.bookings) ?? [], [data]);
 
   const renderBookingItem = ({ item }: { item: Booking }) => (
     <View style={styles.itemContainer}>
-      {/* API tidak menyediakan nama fasilitas, jadi kita tampilkan ID-nya */}
       <Text style={styles.itemName}>Fasilitas ID: {item.facilityId}</Text>
       <Text style={styles.itemDetail}>Tanggal: {new Date(item.bookingDate).toLocaleDateString('id-ID')}</Text>
       <Text style={styles.itemDetail}>Waktu: {item.startHour}:00 - {item.endHour}:00</Text>
@@ -78,10 +70,8 @@ export const BookingList = () => {
     </View>
   );
 
-  // Bagian JSX (return) tidak ada perubahan
   return (
     <View style={styles.container}>
-      {/* Kontrol Filter dan Sort */}
       <View style={styles.controlsContainer}>
         <View style={styles.filterGroup}>
           <Pressable onPress={() => setStatusFilter('')} style={[styles.filterButton, statusFilter === '' && styles.activeFilter]}><Text style={[styles.filterText, statusFilter === '' && styles.activeFilterText]}>Semua</Text></Pressable>
@@ -117,7 +107,6 @@ export const BookingList = () => {
   );
 }
 
-// Styles tidak ada perubahan
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   controlsContainer: { padding: 10, backgroundColor: 'white', borderBottomWidth: 1, borderColor: '#eee' },

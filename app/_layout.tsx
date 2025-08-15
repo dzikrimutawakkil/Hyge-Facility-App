@@ -7,7 +7,6 @@ import { ActivityIndicator, View } from 'react-native';
 
 const queryClient = new QueryClient();
 
-// Komponen untuk menangani logika autentikasi
 const AuthLayout = () => {
   const { isAuthenticated, initialize, isInitializing } = useAuthStore();
   

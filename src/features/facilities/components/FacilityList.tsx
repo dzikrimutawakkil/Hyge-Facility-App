@@ -1,78 +1,119 @@
 // src/features/facilities/components/FacilityList.tsx
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator, Pressable } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'expo-router';
-import { fetchFacilities } from '../api/facilitiesAPI';
-import { Facility } from '../types';
-import { useDebounce } from '../../../hooks/useDebounce';
-import { useAuthStore } from '@/src/features/auth/stores/authStore';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  ActivityIndicator,
+  Pressable,
+  Image,
+  ImageBackground,
+} from 'react-native'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from 'expo-router'
+import { Feather, FontAwesome } from '@expo/vector-icons'
 
+import { fetchFacilities } from '../api/facilitiesAPI'
+import { Facility } from '../types'
+import { useDebounce } from '@/src/hooks/useDebounce'
+import { useAuthStore } from '@/src/features/auth/stores/authStore'
+import { getUserProfile } from '@/src/features/auth/api/authAPI'
+import { UserProfile } from '@/src/features/auth/types'
 
 export const FacilityList = () => {
-  const [searchText, setSearchText] = useState('');
-  const debouncedSearchTerm = useDebounce(searchText, 500);
+  const [searchText, setSearchText] = useState('')
+  const debouncedSearchTerm = useDebounce(searchText, 500)
+  const { isAuthenticated } = useAuthStore()
 
-  const { isAuthenticated } = useAuthStore(); 
+  const { data: user } = useQuery<UserProfile, Error>({
+    queryKey: ['userProfile'],
+    queryFn: getUserProfile,
+    enabled: isAuthenticated,
+  })
 
-  const {
-    data: facilities,
-    isLoading,
-    error,
-  } = useQuery<Facility[], Error>({
+  const { data: facilities, isLoading, error } = useQuery<Facility[], Error>({
     queryKey: ['facilities', debouncedSearchTerm],
     queryFn: () => fetchFacilities(debouncedSearchTerm),
-    enabled: isAuthenticated
-  });
-
-  const getStatusColor = (status: Facility['status']) => {
-    switch (status) {
-      case 'active':
-        return '#4CAF50'; // Hijau
-      case 'maintenance':
-        return '#FFC107'; // Kuning
-      case 'inactive':
-        return '#9E9E9E'; // Abu-abu
-      default:
-        return '#9E9E9E';
-    }
-  };
+    enabled: isAuthenticated,
+  })
 
   const renderFacilityItem = ({ item }: { item: Facility }) => (
-    <Link href={`/facility/${item.id.toString()}`} asChild>
-      <Pressable style={styles.itemContainer}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status) },
-          ]}
+    <View style= {styles.card}>
+      <Link href={`/facility/${item.id.toString()}`} asChild>
+        <Pressable
+          style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
         >
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </Pressable>
-    </Link>
-  );
+          <Image
+            source={require('../../../../assets/images/header-facility-list.jpg')}
+            style={styles.cardImage}
+            resizeMode="cover"
+          />
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardDescription} numberOfLines={2}>
+              {item.description}
+            </Text>
+          </View>
+        </Pressable>
+      </Link>
+    </View>
+  )
 
-  // Bagian JSX (return) tidak ada perubahan
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Cari fasilitas..."
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      <ImageBackground
+        source={require('../../../../assets/images/header-facility-list.jpg')}
+        style={styles.headerBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.headerContent}>
+          <View style = {styles.profileContainer}>
+            <Link href="/profile" asChild>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.profileButton,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <FontAwesome name="user-circle" size={30} color="#FFFFFF" />
+              </Pressable>
+            </Link>
+          </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.greetingText}>
+              Hey, {user?.name || 'there'}
+            </Text>
+            <Text style={styles.mainTitle}>Where do you want to go?</Text>
+          </View>
 
-      {isLoading && <ActivityIndicator size="large" style={styles.loading} />}
+          <Pressable style={styles.searchPressable}>
+            <View style={styles.searchContainer}>
+              <Feather
+                name="search"
+                size={20}
+                color="#333"
+                style={styles.searchIcon}
+              />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search places"
+                placeholderTextColor="#555"
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+            </View>
+          </Pressable>
+        </View>
+      </ImageBackground>
 
+      {isLoading && (
+        <ActivityIndicator size="large" style={styles.loading} color="#2563EB" />
+      )}
       {error && (
-        <Text style={styles.errorText}>
-          Gagal memuat fasilitas: {error.message}
-        </Text>
+        <Text style={styles.errorText}>Gagal memuat fasilitas: {error.message}</Text>
       )}
 
       {!isLoading && !error && (
@@ -80,30 +121,81 @@ export const FacilityList = () => {
           data={facilities}
           renderItem={renderFacilityItem}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 20 }}
           ListEmptyComponent={
             <Text style={styles.emptyText}>Fasilitas tidak ditemukan.</Text>
           }
         />
       )}
     </View>
-  );
-};
+  )
+}
 
-// Styles tidak ada perubahan
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
   },
-  searchBar: {
-    padding: 12,
-    margin: 10,
-    backgroundColor: 'white',
-    borderRadius: 8,
+  profileContainer: {
+    alignItems: 'flex-end',
+    paddingEnd: 24
+  },
+  headerBackground: {
+    paddingBottom: 24,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    overflow: 'hidden',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  headerContent: {
+    paddingTop: 40,
+  },
+  headerContainer: {
+    paddingHorizontal: 24,
+    marginBottom: 16,
+  },
+  greetingText: {
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    color: '#FFFFFF',
+    opacity: 0.9,
+  },
+  mainTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 4,
+  },
+  profileButton: {
+    top: 60,
+    justifyContent: 'flex-end',
+  },
+  searchPressable: {
+    marginHorizontal: 24,
+    borderRadius: 30,
+    backgroundColor: 'white',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    paddingHorizontal: 20,
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#2D3748',
+    fontWeight: '500',
   },
   loading: {
     marginTop: 50,
@@ -113,39 +205,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: 'red',
   },
-  itemContainer: {
-    backgroundColor: 'white',
-    padding: 15,
-    marginVertical: 8,
-    marginHorizontal: 10,
-    borderRadius: 8,
-    elevation: 2, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+  card: {
+    backgroundColor: "#FFFF",
+    borderRadius: 16,
+    marginVertical: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    overflow: 'hidden',
   },
-  itemName: {
+  cardImage: {
+    width: '100%',
+    height: 180,
+  },
+  cardContent: {
+    padding: 8,
+  },
+  cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#1A202C',
   },
-  itemDescription: {
+  cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#718096',
     marginTop: 4,
-  },
-  statusBadge: {
-    marginTop: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  statusText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
-    textTransform: 'capitalize',
   },
   emptyText: {
     textAlign: 'center',
@@ -153,4 +239,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-});
+})

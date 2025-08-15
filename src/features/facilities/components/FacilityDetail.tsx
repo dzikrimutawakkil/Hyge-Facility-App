@@ -36,8 +36,6 @@ export const FacilityDetails = () => {
                     availability.map((slot) => (
                         <Link
                             key={slot.hour}
-                            // --- PERBAIKAN: Selalu berikan href yang valid ---
-                            // Prop 'disabled' di bawah ini yang akan mencegah navigasi.
                             href={`/booking/${facility.id}/${formattedDate}?hour=${slot.hour}`}
                             disabled={!slot.available}
                             asChild
@@ -59,7 +57,6 @@ export const FacilityDetails = () => {
   );
 }
 
-// --- (Tidak ada perubahan pada Styles) ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
