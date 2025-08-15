@@ -77,7 +77,7 @@ export const FacilityDetails = () => {
   
   const handleBookNow = () => {
     if (selectedHour === null) return;
-    router.push(`/booking/${facility?.id}/${formattedDate}?hour=${selectedHour}`);
+    router.push(`/booking/${facility?.id}/${facility?.name}/${formattedDate}?hour=${selectedHour}`);
   };
 
   if (isLoadingDetails) {

@@ -1,13 +1,15 @@
 // src/features/bookings/components/BookingForm.tsx
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Button, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Picker } from '@react-native-picker/picker';
+import { Feather } from '@expo/vector-icons';
+
 import { createBooking } from '../api/bookingsAPI';
-import { fetchAvailability } from '../api/bookingsAPI'; 
+import { fetchAvailability } from '@/src/features/bookings/api/bookingsAPI';
 import { bookingSchema, BookingFormValues } from '../types';
 
 export const BookingForm = () => {
@@ -16,7 +18,8 @@ export const BookingForm = () => {
 
   const { params, hour } = useLocalSearchParams<{ params: string[], hour?: string }>();
   const facilityIdFromUrl = params?.[0];
-  const bookingDate = params?.[1];
+  const facilityNameFromUrl = params?.[1];
+  const bookingDate = params?.[2];
 
   const facilityIdAsNumber = facilityIdFromUrl ? parseInt(facilityIdFromUrl, 10) : undefined;
 
@@ -39,7 +42,7 @@ export const BookingForm = () => {
   const mutation = useMutation({
     mutationFn: createBooking,
     onSuccess: () => {
-      Alert.alert('Sukses!', 'Booking Anda telah dikonfirmasi.');
+      Alert.alert('Success!', 'Your booking has been confirmed.');
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       queryClient.invalidateQueries({ queryKey: ['monthlyAvailability'] });
@@ -47,9 +50,9 @@ export const BookingForm = () => {
     },
     onError: (error: any) => {
       if (error.response?.status === 409) {
-        Alert.alert('Booking Bentrok', error.response.data.message);
+        Alert.alert('Booking Conflict', error.response.data.message);
       } else {
-        Alert.alert('Error', 'Gagal membuat booking. Silakan coba lagi.');
+        Alert.alert('Error', 'Failed to create booking. Please try again.');
       }
     },
   });
@@ -59,72 +62,186 @@ export const BookingForm = () => {
   };
 
   if (!facilityIdAsNumber || !bookingDate) {
-    return <Text style={styles.errorText}>Informasi booking tidak lengkap.</Text>;
+    return <Text style={styles.errorText}>Missing booking information.</Text>;
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
-      <Text style={styles.header}>Konfirmasi Booking Anda</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.headerButton}>
+          <Feather name="x" size={24} color="#1A202C" />
+        </Pressable>
+        <Text style={styles.headerTitle}>Confirm Your Booking</Text>
+        <View style={styles.headerButton} />{/* Empty view for spacing */}
+      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        
+        {/* Info Section */}
+        <Text style={styles.label}>Detail Facility</Text>
+        <View style={styles.infoContainer}>
+          <View style={styles.infoRow}>
+            <Feather name="map-pin" size={20} color="#4A5568" style={styles.infoIcon} />
+            <Text style={styles.infoLabel}>Facility:</Text>
+            <Text style={styles.infoValue}>{facilityNameFromUrl}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Feather name="calendar" size={20} color="#4A5568" style={styles.infoIcon} />
+            <Text style={styles.infoLabel}>Date:</Text>
+            <Text style={styles.infoValue}>{bookingDate}</Text>
+          </View>
+        </View>
 
-      <Text style={styles.label}>Fasilitas ID</Text>
-      <TextInput style={styles.input} value={facilityIdFromUrl} editable={false} />
-
-      <Text style={styles.label}>Tanggal Booking</Text>
-      <TextInput style={styles.input} value={bookingDate} editable={false} />
-
-      <Text style={styles.label}>Waktu Mulai</Text>
-      {isLoadingSlots ? <ActivityIndicator /> : (
-        <Controller
-          control={control}
-          name="startHour"
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.pickerContainer}>
-              <Picker selectedValue={value} onValueChange={onChange}>
-                <Picker.Item label="-- Pilih Slot Waktu --" value={-1} />
-                {availableSlots?.filter(slot => slot.available).map(slot => (
-                  <Picker.Item key={slot.hour} label={`${slot.startTime} - ${slot.endTime}`} value={slot.hour} />
-                ))}
-              </Picker>
-            </View>
-          )}
-        />
-      )}
-      {errors.startHour && <Text style={styles.errorText}>{errors.startHour.message}</Text>}
-
-      <Text style={styles.label}>Catatan (Opsional)</Text>
-      <Controller
-        control={control}
-        name="notes"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={[styles.input, styles.notesInput]}
-            placeholder="Ada permintaan khusus?"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            multiline
+        {/* Time Slot Picker */}
+        <Text style={styles.label}>Time Slot</Text>
+        {isLoadingSlots ? <ActivityIndicator /> : (
+          <Controller
+            control={control}
+            name="startHour"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.pickerContainer}>
+                <Picker selectedValue={value} onValueChange={onChange} itemStyle={styles.pickerItem}>
+                  <Picker.Item label="-- Select a Time Slot --" value={-1} />
+                  {availableSlots?.filter(slot => slot.available).map(slot => (
+                    <Picker.Item key={slot.hour} label={`${slot.startTime} - ${slot.endTime}`} value={slot.hour} />
+                  ))}
+                </Picker>
+              </View>
+            )}
           />
         )}
-      />
+        {errors.startHour && <Text style={styles.errorText}>{errors.startHour.message}</Text>}
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title={mutation.isPending ? 'Memesan...' : 'Konfirmasi Booking'}
+        <Text style={styles.label}>Notes (Optional)</Text>
+        <Controller
+          control={control}
+          name="notes"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.notesInput}
+              placeholder="Any special requests?"
+              placeholderTextColor="#A0AEC0"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              multiline
+            />
+          )}
+        />
+      </ScrollView>
+
+      {/* Footer with Confirm Button */}
+      <View style={styles.footer}>
+        <Pressable
+          style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
           onPress={handleSubmit(onSubmit)}
           disabled={mutation.isPending}
-        />
+        >
+          {mutation.isPending ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Confirm Booking</Text>
+          )}
+        </Pressable>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, paddingHorizontal: 20, paddingTop: 20 },
-  label: { fontSize: 16, fontWeight: '500', color: '#333', marginTop: 15, marginBottom: 5, paddingHorizontal: 20 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, backgroundColor: '#f5f5f5', marginHorizontal: 20 },
-  notesInput: { height: 100, textAlignVertical: 'top' },
-  pickerContainer: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, marginHorizontal: 20 },
-  errorText: { color: 'red', marginTop: 5, paddingHorizontal: 20 },
-  buttonContainer: { marginTop: 30, paddingHorizontal: 20, paddingBottom: 40}
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerTitle: { fontSize: 18, fontWeight: 'bold' },
+  headerButton: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
+  scrollContainer: { padding: 24, paddingBottom: 120 },
+  infoContainer: {
+    backgroundColor: '#F7F8FA',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  infoIcon: {
+    marginRight: 12,
+  },
+  infoLabel: {
+    fontSize: 16,
+    color: '#4A5568',
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#1A202C',
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  label: { 
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    color: '#1A202C', 
+    marginBottom: 8 
+  },
+  pickerContainer: { 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 12,
+    backgroundColor: '#F7F8FA',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  pickerItem: {
+    height: 120, // For iOS
+  },
+  notesInput: { 
+    height: 120, 
+    textAlignVertical: 'top',
+    padding: 16,
+    fontSize: 16,
+    backgroundColor: '#F7F8FA',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    color: '#2D3748',
+  },
+  errorText: { 
+    color: '#E53E3E', 
+    marginTop: 8, 
+    marginLeft: 4 
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  button: {
+    backgroundColor: '#2563EB',
+    height: 56,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
