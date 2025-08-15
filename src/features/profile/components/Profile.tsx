@@ -1,13 +1,16 @@
-// src/features/profile/components/Profile.tsx
-import React from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator, Alert, Pressable } from 'react-native';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, Pressable } from 'react-native';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../auth/stores/authStore';
-import { getUserProfile, logOutUser } from '../../auth/api/authAPI';
-import { UserProfile } from '../../auth/types';
+import { getUserProfile, logOutUser, updateUserProfile } from '../../auth/api/authAPI';
+import { UserProfile, UpdateProfileFormValues } from '../../auth/types';
+import { UpdateProfileForm } from './UpdateProfileForm';
+import { FontAwesome } from '@expo/vector-icons';
 
 export const Profile = () => {
   const { logout: clearLocalTokens } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { data: user, isLoading, error } = useQuery<UserProfile, Error>({
     queryKey: ['userProfile'],
@@ -26,6 +29,19 @@ export const Profile = () => {
     },
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      setModalVisible(false);
+      Alert.alert('Success', 'Profile updated successfully.');
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Update failed. Please try again.';
+      Alert.alert('Update Error', message);
+    },
+  });
+
   const handleLogout = () => {
     Alert.alert(
       "Logout",
@@ -35,6 +51,10 @@ export const Profile = () => {
         { text: "Ya, Keluar", style: "destructive", onPress: () => logoutMutation.mutate() }
       ]
     );
+  };
+
+  const handleUpdateProfile = (data: UpdateProfileFormValues) => {
+    updateProfileMutation.mutate(data);
   };
 
   if (isLoading) {
@@ -53,30 +73,42 @@ export const Profile = () => {
         </View>
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
+        <Pressable style={styles.editButton} onPress={() => setModalVisible(true)}>
+          <FontAwesome name="pencil" size={16} color="#fff" />
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </Pressable>
       </View>
-      <Pressable 
-        style={styles.logoutButton} 
-        onPress={handleLogout} 
+
+      <Pressable
+        style={styles.logoutButton}
+        onPress={handleLogout}
         disabled={logoutMutation.isPending}
       >
         <Text style={styles.logoutButtonText}>
           {logoutMutation.isPending ? "Logging out..." : "Logout"}
         </Text>
       </Pressable>
+      
+      {user && (
+        <UpdateProfileForm
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSubmit={handleUpdateProfile}
+          isUpdating={updateProfileMutation.isPending}
+          currentName={user.name}
+          currentEmail={user.email}
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60,
     flex: 1,
+    paddingTop: 60,
     padding: 20,
     backgroundColor: '#f5f5f5',
-    paddingBottom: 40,
-  },
-  button: {
-    marginTop: 40,
   },
   centered: {
     flex: 1,
@@ -93,6 +125,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    marginBottom: 20,
   },
   avatar: {
     width: 100,
@@ -117,6 +150,20 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginTop: 8,
   },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1976D2',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginTop: 15,
+  },
+  editButtonText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontWeight: 'bold',
+  },
   errorText: {
     textAlign: 'center',
     color: 'red',
@@ -127,11 +174,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
+    marginTop: 20,
   },
   logoutButtonText: {
     color: 'white',

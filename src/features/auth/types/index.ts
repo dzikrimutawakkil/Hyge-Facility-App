@@ -13,6 +13,14 @@ export const registerSchema = z.object({
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
+export const updateProfileSchema = z.object({
+  name: z.string().min(3, 'Name must be at least 3 characters long.'),
+  email: z.string().email('Invalid email address.'),
+  currentPassword: z.string().min(1, "Current password is required."),
+  newPassword: z.string().min(6, 'New password must be at least 6 characters long.').optional().or(z.literal('')),
+});
+export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
+
 export type UserProfile = {
   id: number;
   name: string;
