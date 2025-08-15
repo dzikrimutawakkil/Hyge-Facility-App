@@ -63,7 +63,6 @@ export const BookingList = () => {
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>Facility ID: {item.facilityId}</Text>
           <View style={[styles.statusBadge, isBooked ? styles.statusBooked : styles.statusCancelled]}>
-            {/* PERBAIKAN 1: Terapkan style warna teks secara kondisional */}
             <Text style={[styles.statusText, isBooked ? styles.statusTextBooked : styles.statusTextCancelled]}>
               {item.status}
             </Text>
@@ -199,19 +198,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusBooked: { backgroundColor: '#DBEAFE' },
-  // PERBAIKAN 2: Latar belakang untuk status 'cancelled'
   statusCancelled: { backgroundColor: '#FEE2E2' }, 
   statusText: {
     fontWeight: 'bold',
     fontSize: 12,
     textTransform: 'capitalize',
   },
-  // PERBAIKAN 3: Style terpisah untuk warna teks
   statusTextBooked: {
-    color: '#1E40AF', // Biru
+    color: '#1E40AF',
   },
   statusTextCancelled: {
-    color: '#B91C1C', // Merah
+    color: '#B91C1C',
   },
   cardBody: {
     gap: 8,
