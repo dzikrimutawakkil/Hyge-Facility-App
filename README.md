@@ -116,17 +116,34 @@ The project is organized with a feature-based approach to keep the codebase modu
 
 ## 🖼️ Screenshots
 
-| Login | Register | Facility List |
-| :---: | :---: | :---: |
-| ![Login Screen](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0006.jpg) | ![Register Screen](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0007.jpg) | ![Facility List](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0008.jpg) |
-
-| Facility Details | Booking | Booking List |
-| :---: | :---: | :---: |
-| ![Facility Details](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0005.jpg) | ![Booking Screen](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0003.jpg) | ![Booking List](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0001.jpg) |
-
-| Profile |
-| :---: |
-| ![Profile Screen](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0002.jpg) |
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0006.jpg" alt="Login Screen" width="300"></td>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0007.jpg" alt="Register Screen" width="300"></td>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0008.jpg" alt="Facility List" width="300"></td>
+  </tr>
+  <tr align="center">
+    <td><b>Login</b></td>
+    <td><b>Register</b></td>
+    <td><b>Facility List</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0005.jpg" alt="Facility Details" width="300"></td>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0003.jpg" alt="Booking Screen" width="300"></td>
+    <td><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0001.jpg" alt="Booking List" width="300"></td>
+  </tr>
+   <tr align="center">
+    <td><b>Facility Details</b></td>
+    <td><b>Booking</b></td>
+    <td><b>Booking List</b></td>
+  </tr>
+   <tr>
+    <td colspan="3" align="center"><img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/screenshots/IMG-20250816-WA0002.jpg" alt="Profile Screen" width="300"></td>
+  </tr>
+   <tr align="center">
+    <td colspan="3"><b>Profile</b></td>
+  </tr>
+</table>
 
 ---
 
