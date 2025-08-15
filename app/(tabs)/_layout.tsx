@@ -32,7 +32,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="booking"
         options={{
-          title: 'Booking Saya',
+          title: 'Booking List',
           headerRight: () => <ProfileIcon />,
         }}
       />

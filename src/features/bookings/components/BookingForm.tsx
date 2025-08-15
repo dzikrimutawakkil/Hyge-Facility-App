@@ -72,7 +72,7 @@ export const BookingForm = () => {
           <Feather name="x" size={24} color="#1A202C" />
         </Pressable>
         <Text style={styles.headerTitle}>Confirm Your Booking</Text>
-        <View style={styles.headerButton} />{/* Empty view for spacing */}
+        <View style={styles.headerButton} />
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         
@@ -91,7 +91,6 @@ export const BookingForm = () => {
           </View>
         </View>
 
-        {/* Time Slot Picker */}
         <Text style={styles.label}>Time Slot</Text>
         {isLoadingSlots ? <ActivityIndicator /> : (
           <Controller
@@ -129,7 +128,6 @@ export const BookingForm = () => {
         />
       </ScrollView>
 
-      {/* Footer with Confirm Button */}
       <View style={styles.footer}>
         <Pressable
           style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
@@ -204,7 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   pickerItem: {
-    height: 120, // For iOS
+    height: 120,
   },
   notesInput: { 
     height: 120, 
