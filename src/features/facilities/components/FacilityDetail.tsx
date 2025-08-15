@@ -172,7 +172,6 @@ export const FacilityDetails = () => {
   );
 };
 
-// Stylesheet yang diperbarui
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -218,10 +217,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     borderColor: '#1E40AF',
   },
-  // Style teks dipisahkan agar lebih mudah diatur
   timeSlotText: { fontWeight: '500' },
   timeSlotAvailableText: { color: '#1E40AF' },
-  timeSlotBookedText: { color: '#A0AEC0' }, // Warna abu-abu untuk teks
+  timeSlotBookedText: { color: '#A0AEC0' },
   timeSlotSelectedText: {
     color: 'white',
   },
