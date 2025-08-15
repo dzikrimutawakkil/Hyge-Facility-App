@@ -91,7 +91,7 @@ Make sure you have the following installed on your system:
 
 The project is organized with a feature-based approach to keep the codebase modular and maintainable. This structure is inspired by the principles outlined in the [bulletproof-react](https://github.com/alan2207/bulletproof-react) repository, which promotes scalability and separation of concerns.
 
-
+```
 .
 ├── app/
 │   ├── (tabs)/
@@ -110,7 +110,7 @@ The project is organized with a feature-based approach to keep the codebase modu
 │   └── libs/
 ├── assets/
 └── constants/
-
+```
 
 ---
 
