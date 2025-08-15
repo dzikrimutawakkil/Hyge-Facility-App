@@ -1,17 +1,50 @@
 // app/_layout.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Slot } from 'expo-router';
+import { useAuthStore } from '@/src/features/auth/stores/authStore';
+import { Slot, useRouter, useSegments } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
 
-// 1. Create a new QueryClient instance
 const queryClient = new QueryClient();
+
+// Komponen untuk menangani logika autentikasi
+const AuthLayout = () => {
+  const { isAuthenticated, initialize, isInitializing } = useAuthStore();
+  
+  const segments = useSegments() as string[]; 
+  
+  const router = useRouter();
+
+  useEffect(() => {
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (isInitializing) return;
+    const inAuthPages = segments.includes('login') || segments.includes('register');
+
+    if (isAuthenticated && inAuthPages) {
+      router.replace('/(tabs)');
+    } else if (!isAuthenticated && !inAuthPages) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, isInitializing, segments]);
+
+  if (isInitializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return <Slot />;
+};
 
 export default function RootLayout() {
   return (
-    // 2. Wrap your entire app with the QueryClientProvider
     <QueryClientProvider client={queryClient}>
-      {/* Slot renders the current page */}
-      <Slot />
+      <AuthLayout />
     </QueryClientProvider>
   );
 }

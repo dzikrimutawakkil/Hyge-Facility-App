@@ -12,3 +12,9 @@ export const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export type UserProfile = {
+  id: number;
+  name: string;
+  email: string;
+};

@@ -1,5 +1,5 @@
 import api from '../../../libs/axios';
-import { LoginFormValues, RegisterFormValues } from '../types';
+import { LoginFormValues, RegisterFormValues, UserProfile } from '../types';
 
 export const loginUser = async (data: LoginFormValues) => {
   const response = await api.post('/auth/login', data);
@@ -8,4 +8,13 @@ export const loginUser = async (data: LoginFormValues) => {
 
 export const registerUser = async (data: RegisterFormValues) => {
   return api.post('/auth/register', data);
+};
+
+export const getUserProfile = async () => {
+  const response = await api.get('/auth/profile');
+  return response.data.user;
+};
+
+export const logOutUser = async () => {
+  return api.post('/auth/logout');
 };

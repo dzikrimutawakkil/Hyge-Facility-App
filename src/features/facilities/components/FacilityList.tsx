@@ -3,27 +3,26 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator, Pressable } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'expo-router';
-
-// DIIMPOR: Menggunakan tipe dan fungsi API dari lokasi baru yang terpusat
 import { fetchFacilities } from '../api/facilitiesAPI';
 import { Facility } from '../types';
-
-// DIIMPOR: Hook custom tetap di lokasi yang sama
 import { useDebounce } from '../../../hooks/useDebounce';
+import { useAuthStore } from '@/src/features/auth/stores/authStore';
 
-// Nama komponen diubah dan diekspor agar bisa digunakan di file lain
+
 export const FacilityList = () => {
   const [searchText, setSearchText] = useState('');
   const debouncedSearchTerm = useDebounce(searchText, 500);
+
+  const { isAuthenticated } = useAuthStore(); 
 
   const {
     data: facilities,
     isLoading,
     error,
   } = useQuery<Facility[], Error>({
-    // React Query akan otomatis refetch jika debouncedSearchTerm berubah
     queryKey: ['facilities', debouncedSearchTerm],
     queryFn: () => fetchFacilities(debouncedSearchTerm),
+    enabled: isAuthenticated
   });
 
   const getStatusColor = (status: Facility['status']) => {

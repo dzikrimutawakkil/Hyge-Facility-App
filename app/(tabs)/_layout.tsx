@@ -1,40 +1,41 @@
 // app/(tabs)/_layout.tsx
-import React, { useEffect } from 'react';
-import { Tabs, Redirect } from 'expo-router'; // Import Redirect
-import { useAuthStore } from '../../src/features/auth/stores/authStore';
-import { ActivityIndicator, View } from 'react-native';
+import React from 'react';
+import { Tabs, Link } from 'expo-router';
+import { Pressable } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function TabsLayout() {
-  const { isAuthenticated, initialize } = useAuthStore();
-  const [isInitializing, setIsInitializing] = React.useState(true);
+  const ProfileIcon = () => (
+    <Link href="/profile" asChild>
+      <Pressable>
+        {({ pressed }) => (
+          <FontAwesome
+            name="user-circle"
+            size={25}
+            color="#333"
+            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          />
+        )}
+      </Pressable>
+    </Link>
+  );
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      await initialize();
-      setIsInitializing(false);
-    };
-    checkAuth();
-  }, []);
-
-  // 1. Show a loading spinner while we check for tokens
-  if (isInitializing) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  // 2. After checking, if the user is NOT authenticated, render a Redirect component
-  if (!isAuthenticated) {
-    return <Redirect href="/login" />;
-  }
-
-  // 3. If the user IS authenticated, render the tabs
   return (
     <Tabs>
-      <Tabs.Screen name="index" options={{ title: 'Facilities' }} />
-      <Tabs.Screen name="bookings" options={{ title: 'My Bookings' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Fasilitas',
+          headerRight: () => <ProfileIcon />,
+        }}
+      />
+      <Tabs.Screen
+        name="booking"
+        options={{
+          title: 'Booking Saya',
+          headerRight: () => <ProfileIcon />,
+        }}
+      />
     </Tabs>
   );
 }

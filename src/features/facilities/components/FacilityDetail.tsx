@@ -4,13 +4,9 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Pressable } from
 import { useLocalSearchParams, Link } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, DateData } from 'react-native-calendars';
-
-// Mengimpor dari lokasi baru yang terpusat
 import { fetchFacilityDetails, fetchDailyAvailability, fetchMonthlyAvailability } from '../api/facilitiesAPI';
-import { FacilityDetail, TimeSlot, MonthlyAvailability } from '../types';
 
 export const FacilityDetails = () => {
-    // --- (Tidak ada perubahan pada hooks di atas) ---
     const { id } = useLocalSearchParams<{ id: string }>();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() + 1 });
