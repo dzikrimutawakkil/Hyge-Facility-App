@@ -2,7 +2,7 @@
 
 Welcome to the Hyge Facility Booking App! This is a mobile application built with React Native and Expo that allows users to easily browse, book, and manage facilities.
 
-![Hyge Facility App Logo](https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/images/app-logo.png)
+<img src="https://raw.githubusercontent.com/dzikrimutawakkil/hyge-facility-app/main/assets/images/app-logo.png" alt="Hyge Facility App Logo" width="150">
 
 ## 🚀 Features
 
@@ -78,11 +78,7 @@ Make sure you have the following installed on your system:
 
 1.  **Start the development server:**
     ```bash
-    npm start
-    ```
-    or
-    ```bash
-    yarn start
+    expo start
     ```
 
 2.  **Run on a device or simulator:**
@@ -93,23 +89,27 @@ Make sure you have the following installed on your system:
 
 ## 📁 Project Structure
 
-The project is organized with a feature-based approach to keep the codebase modular and maintainable. This structure is inspired by the principles outlined in the [bulletproof-react](https://github.com/alan2207/bulletproof-react) repository.
+The project is organized with a feature-based approach to keep the codebase modular and maintainable. This structure is inspired by the principles outlined in the [bulletproof-react](https://github.com/alan2207/bulletproof-react) repository, which promotes scalability and separation of concerns.
 
 
 .
-├── app/                  # Expo Router file-based routing
-│   ├── (tabs)/           # Layout for the main tab navigation
-│   ├── facility/         # Dynamic route for facility details
+├── app/
+│   ├── (tabs)/
+│   │   ├── _layout.tsx
+│   │   ├── booking.tsx
+│   │   └── index.tsx
+│   ├── facility/
+│   │   └── [id].tsx
 │   └── ...
 ├── src/
-│   ├── features/         # Feature-based modules
-│   │   ├── auth/         # Authentication (login, register, profile)
-│   │   ├── bookings/     # Booking management
-│   │   └── facilities/   # Facility browsing and details
-│   ├── hooks/            # Reusable custom hooks
-│   └── libs/             # Library configurations (e.g., Axios)
-├── assets/               # Static assets like images and fonts
-└── constants/            # App-wide constants (e.g., colors)
+│   ├── features/
+│   │   ├── auth/
+│   │   ├── bookings/
+│   │   └── facilities/
+│   ├── hooks/
+│   └── libs/
+├── assets/
+└── constants/
 
 
 ---
